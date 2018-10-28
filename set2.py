@@ -24,15 +24,17 @@ def bloom_filter_set():
 # family should be able to hash a word from the data stream to a number in the
 # appropriate range needed.
 
+import numpy as np
 def uhf(rng):
     """Returns a hash function that can map a word to a number in the range
     0 - rng
     """
-    p = 7629137
+    p = 567629137
     a = np.random.randint(1,p)
     b = np.random.randint(0,p)
     return lambda x: ((a*x+b)%p)%rng
     pass
+
 
 ############### 
 
@@ -40,16 +42,17 @@ def uhf(rng):
 
 from bitarray import bitarray
 size = 2**18   # size of the filter
-hash_fns = [uhf(size), uhf(size), uhf(size), uhf(size), uhf(size)]  # place holder for hash functions
+(h1,h2,h3,h4,h5) = (uhf(size), uhf(size), uhf(size), uhf(size), uhf(size))
+hash_fns = [h1,h2,h3,h4,h5]  # place holder for hash functions
 
 bloom_filter = None
 num_words = 0         # number in data stream
 num_words_in_set = 0  # number in Bloom filter's set
-fp = 0
+fp = 0  #false possitive
 
-bita = bitarray()  #creat a bitarray, fill in false
-for i in range(size): bita.append(False)
-    
+bita = bitarray(size)  #creat a bitarray, fill in false
+bita.setall = False
+
 for word in bloom_filter_set(): # add the word to the filter by hashing etc.
     bword = ''.join(format(ord(i), 'b') for i in word)
     bword = int(bword,2)
@@ -57,19 +60,19 @@ for word in bloom_filter_set(): # add the word to the filter by hashing etc.
     num_words += 1    
     pass
 
+p_set = [word for word in bloom_filter_set()]
+
 for word in data_stream():  # check for membership in the Bloom filter
-    dword = ''.join(format(ord(i), 'b') for i in word) 
-    dword = int(dword,2)
+    if word not in p_set: fp += 1
     num_words_in_set += 1
     pass
 
-
-fp = 0
-
 #results
-print('part 1:')
+print('Part 1:')
 print('Total number of words in bloom filter set = %s'%(num_words,))
 print('Total number of words in stream = %s'%(num_words_in_set,))
+print('The false possitive= %s'%(fp,))
+
       
 ################### Part 2 ######################
 
