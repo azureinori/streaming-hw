@@ -77,21 +77,40 @@ print('The false possitive= %s'%(fp,))
 ################### Part 2 ######################
 
 hash_range = 24 # number of bits in the range of the hash functions
-fm_hash_functions = [None]*35  # Create the appropriate hashes here
+fm_hash_functions = [uhf(hash_range)]*35  # Create the appropriate hashes here
 
 def num_trailing_bits(n):
     """Returns the number of trailing zeros in bin(n)
-
     n: integer
     """
-    pass
+    p = 0
+    if n == 0: return 24
+    while (n >> p) & 1 == 0:
+        p += 1
+    return p
 
+zeroes = []
+compare = []
 num_distinct = 0
 
-#for word in data_stream(): # Implement the Flajolet-Martin algorithm
-#    pass
+for word in data_stream():  # Implement the Flajolet-Martin algorithm
+    dword = ''.join(format(ord(i),'b')for i in word)
+    dword = int(dword)
+    n = 5 #35/7
+    for i in range(1, 8):  #seven groups
+        g = fm_hash_functions[i:i+n]
+        for j in range(0,5):
+            a = int(g[j](dword))
+            zeroes.append(num_trailing_bits(a))
+        compare.append(max(zeroes))
+    num_median = np.median(compare)
+    pass
+num_distinct = 2 ** (num_median)
 
+#results
+print('Part 2:')
 print("Estimate of number of distinct elements = %s"%(num_distinct,))
+
 
 ################### Part 3 ######################
 
