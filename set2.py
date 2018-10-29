@@ -115,13 +115,42 @@ print("Estimate of number of distinct elements = %s"%(num_distinct,))
 ################### Part 3 ######################
 
 var_reservoir = [0]*512
-second_moment = 0
+secnd_moment = 0
 third_moment = 0
 
-# You can use numpy.random's API for maintaining the reservoir of variables
+#V = {word: appear times}
+V = {}
 
-#for word in data_stream(): # Imoplement the AMS algorithm here
-#    pass 
-      
-print("Estimate of second moment = %s"%(second_moment,))
-print("Estimate of third moment = %s"%(third_moment,))
+# You can use numpy.random's API for maintaining the reservoir of variables
+import random
+s = []
+sample = []
+words = []
+
+for word in data_stream(): # Imoplement the AMS algorithm here
+    words.append(word)
+    for i in range(0, num_words_in_set):
+        s.append(random.randint(0, num_words_in_set))
+        sample.append(s)
+
+        V[words[sample[i]]] = 0
+        for word in V:
+            V[word] += 1
+            if len(V) > 512: break
+        
+    #calculate v
+    if V[word] != 1:
+        second_moment +=1
+        third_moment += 1
+    if V[word] != 1:
+        second_moment += num_words * (2 * V[word] - 1)  # v^2 - (v-1)^2 = 2*v - 1
+        third_moment  += num_words * (3 * V[word] ** 2 - 3 * V[word]+1)  #v^3-(v-1)^3 = 3v^2 -3v + 1
+    pass
+
+second_moment = second_moment/len(V)
+third_moment = third_moment/len(V)
+
+#results
+print('Part 3:')
+print("Estimate of second moment = %s"%(second_moment/len(var_reservoir),))
+print("Estimate of third moment = %s"%(third_moment/len(var_reservoir),))
